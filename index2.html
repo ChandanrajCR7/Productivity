@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Study Planner</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <link rel="stylesheet" href="style2.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="logo">📚 StudyPlan</div>
+
+      <nav>
+        <div class="nav-link active" data-page="dashboard">
+          <span>📊</span> Dashboard
+        </div>
+        <div class="nav-link" data-page="subjects">
+          <span>📖</span> Subjects
+        </div>
+        <div class="nav-link" data-page="schedule">
+          <span>📅</span> Schedule
+        </div>
+        <div class="nav-link" data-page="tasks"><span>✓</span> Tasks</div>
+        <div class="nav-link" data-page="analytics">
+          <span>📈</span> Analytics
+        </div>
+        <div class="nav-link" data-page="settings">
+          <span>⚙️</span> Settings
+        </div>
+      </nav>
+
+      <button class="theme-toggle" id="themeBtn">🌙</button>
+    </div>
+
+    <!-- Main Area -->
+    <main>
+      <!-- Dashboard -->
+      <div class="page active" id="dashboard">
+        <h1>Dashboard</h1>
+
+        <div class="stats">
+          <div class="stat-box">
+            <h3 id="subjectCount">0</h3>
+            <p>Subjects</p>
+          </div>
+          <div class="stat-box">
+            <h3 id="taskCount">0</h3>
+            <p>Tasks</p>
+          </div>
+          <div class="stat-box">
+            <h3 id="hoursCount">0h</h3>
+            <p>Study Hours</p>
+          </div>
+          <div class="stat-box">
+            <h3 id="completeRate">0%</h3>
+            <p>Completed</p>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <h2>Today's Schedule</h2>
+            <div id="todayList"></div>
+          </div>
+          <div class="card">
+            <h2>Upcoming Deadlines</h2>
+            <div id="deadlineList"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Subjects Overview</h2>
+          <div id="subjectOverview"></div>
+        </div>
+      </div>
+
+      <!-- Subjects -->
+      <div class="page" id="subjects">
+        <div class="page-header">
+          <h1>Subjects</h1>
+          <button class="btn" onclick="app.openModal('subject')">
+            + Add Subject
+          </button>
+        </div>
+        <div id="subjectList" class="grid-3"></div>
+      </div>
+
+      <!-- Schedule -->
+      <div class="page" id="schedule">
+        <div class="page-header">
+          <h1>Schedule</h1>
+          <button class="btn" onclick="app.openModal('schedule')">
+            + Add Session
+          </button>
+        </div>
+
+        <div class="tabs">
+          <button class="tab active" data-view="daily">Daily</button>
+          <button class="tab" data-view="weekly">Weekly</button>
+        </div>
+
+        <div class="schedule-view active" id="dailyView">
+          <div class="date-nav">
+            <button onclick="app.changeDay(-1)">‹</button>
+            <input type="date" id="dateInput" />
+            <button onclick="app.changeDay(1)">›</button>
+          </div>
+          <div id="dailySchedule"></div>
+        </div>
+
+        <div class="schedule-view" id="weeklyView">
+          <div id="weeklySchedule"></div>
+        </div>
+      </div>
+
+      <!-- Tasks -->
+      <div class="page" id="tasks">
+        <div class="page-header">
+          <h1>Tasks</h1>
+          <button class="btn" onclick="app.openModal('task')">
+            + Add Task
+          </button>
+        </div>
+
+        <div class="filters">
+          <button class="filter active" data-filter="all">All</button>
+          <button class="filter" data-filter="pending">Pending</button>
+          <button class="filter" data-filter="completed">Completed</button>
+          <button class="filter" data-filter="overdue">Overdue</button>
+        </div>
+
+        <div id="taskList"></div>
+      </div>
+
+      <!-- Analytics -->
+      <div class="page" id="analytics">
+        <h1>Analytics</h1>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Study Time by Subject</h3>
+            <canvas id="timeChart"></canvas>
+          </div>
+          <div class="card">
+            <h3>Task Completion</h3>
+            <canvas id="taskChart"></canvas>
+          </div>
+          <div class="card">
+            <h3>Weekly Hours</h3>
+            <canvas id="weekChart"></canvas>
+          </div>
+          <div class="card">
+            <h3>Insights</h3>
+            <div id="insights">Add data to see insights</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings -->
+      <div class="page" id="settings">
+        <h1>Settings</h1>
+
+        <div class="card">
+          <h3>Appearance</h3>
+          <label>
+            <input type="checkbox" id="darkMode" />
+            Dark Mode
+          </label>
+        </div>
+
+        <div class="card">
+          <h3>Notifications</h3>
+          <label>
+            <input type="checkbox" id="deadlineNotif" checked />
+            Deadline Reminders
+          </label>
+          <label>
+            <input type="checkbox" id="sessionNotif" checked />
+            Session Reminders
+          </label>
+        </div>
+
+        <div class="card">
+          <h3>Data</h3>
+          <button class="btn" onclick="app.exportData()">Export Data</button>
+          <button class="btn btn-danger" onclick="app.resetData()">
+            Reset All
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Subject Modal -->
+    <div class="modal" id="subjectModal">
+      <div class="modal-box">
+        <h2 id="subjectTitle">Add Subject</h2>
+        <form id="subjectForm">
+          <input type="hidden" id="editSubjectId" />
+          <input
+            type="text"
+            id="subjectName"
+            placeholder="Subject Name"
+            required
+          />
+          <input type="text" id="subjectCode" placeholder="Code (optional)" />
+          <input type="color" id="subjectColor" value="#6366f1" />
+          <select id="subjectPriority">
+            <option value="high">High Priority</option>
+            <option value="medium" selected>Medium Priority</option>
+            <option value="low">Low Priority</option>
+          </select>
+          <textarea id="subjectNotes" placeholder="Notes (optional)"></textarea>
+          <div class="modal-actions">
+            <button
+              type="button"
+              class="btn-secondary"
+              onclick="app.closeModal()"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Schedule Modal -->
+    <div class="modal" id="scheduleModal">
+      <div class="modal-box">
+        <h2 id="scheduleTitle">Add Session</h2>
+        <form id="scheduleForm">
+          <input type="hidden" id="editScheduleId" />
+          <select id="scheduleSubject" required>
+            <option value="">Select Subject</option>
+          </select>
+          <input type="date" id="scheduleDate" required />
+          <select id="scheduleDay">
+            <option value="">One-time</option>
+            <option value="monday">Monday</option>
+            <option value="tuesday">Tuesday</option>
+            <option value="wednesday">Wednesday</option>
+            <option value="thursday">Thursday</option>
+            <option value="friday">Friday</option>
+            <option value="saturday">Saturday</option>
+            <option value="sunday">Sunday</option>
+          </select>
+          <input type="time" id="scheduleStart" required />
+          <input type="time" id="scheduleEnd" required />
+          <input
+            type="text"
+            id="scheduleTopic"
+            placeholder="Topic (optional)"
+          />
+          <div class="modal-actions">
+            <button
+              type="button"
+              class="btn-secondary"
+              onclick="app.closeModal()"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Task Modal -->
+    <div class="modal" id="taskModal">
+      <div class="modal-box">
+        <h2 id="taskTitle">Add Task</h2>
+        <form id="taskForm">
+          <input type="hidden" id="editTaskId" />
+          <input type="text" id="taskName" placeholder="Task Title" required />
+          <select id="taskSubject" required>
+            <option value="">Select Subject</option>
+          </select>
+          <select id="taskType">
+            <option value="assignment">Assignment</option>
+            <option value="exam">Exam</option>
+            <option value="project">Project</option>
+            <option value="reading">Reading</option>
+            <option value="practice">Practice</option>
+          </select>
+          <input type="date" id="taskDeadline" required />
+          <select id="taskPriority">
+            <option value="high">High Priority</option>
+            <option value="medium" selected>Medium Priority</option>
+            <option value="low">Low Priority</option>
+          </select>
+          <textarea
+            id="taskDesc"
+            placeholder="Description (optional)"
+          ></textarea>
+          <div class="modal-actions">
+            <button
+              type="button"
+              class="btn-secondary"
+              onclick="app.closeModal()"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="toast"></div>
+
+    <script src="script2.js"></script>
+  </body>
+</html>
